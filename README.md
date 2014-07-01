@@ -24,4 +24,6 @@ cordova-plugin-echo
 
 Plugin implementation of the Echo function.
 
+### Installation
+`cordova plugin add https://github.com/BobSaintClare/cordova-plugin-echo.git`
 
