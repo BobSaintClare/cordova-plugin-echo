@@ -20,50 +20,21 @@
 #import <Cordova/CDV.h>
 
 @interface CDVEcho : CDVPlugin
+- (void)echo:(CDVInvokedUrlCommand*)command;
 @end
 
 @implementation CDVEcho
 
 - (void)echo:(CDVInvokedUrlCommand*)command
 {
-    id message = [command.arguments objectAtIndex:0];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
+    CDVPluginResult* pluginResult = nil;
+    NSString* echo = [command.arguments objectAtIndex:0];
 
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-- (void)echoAsyncHelper:(NSArray*)args
-{
-    [self.commandDelegate sendPluginResult:[args objectAtIndex:0] callbackId:[args objectAtIndex:1]];
-}
-
-- (void)echoAsync:(CDVInvokedUrlCommand*)command
-{
-    id message = [command.arguments objectAtIndex:0];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
-
-    [self performSelector:@selector(echoAsyncHelper:) withObject:[NSArray arrayWithObjects:pluginResult, command.callbackId, nil] afterDelay:0];
-}
-
-- (void)echoArrayBuffer:(CDVInvokedUrlCommand*)command
-{
-    id message = [command.arguments objectAtIndex:0];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArrayBuffer:message];
-
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-- (void)echoArrayBufferAsync:(CDVInvokedUrlCommand*)command
-{
-    id message = [command.arguments objectAtIndex:0];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArrayBuffer:message];
-
-    [self performSelector:@selector(echoAsyncHelper:) withObject:[NSArray arrayWithObjects:pluginResult, command.callbackId, nil] afterDelay:0];
-}
-
-- (void)echoMultiPart:(CDVInvokedUrlCommand*)command
-{
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:command.arguments];
+    if (echo != nil && [echo length] > 0) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:echo];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

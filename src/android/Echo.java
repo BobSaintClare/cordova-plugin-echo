@@ -17,93 +17,35 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.cordova.test;
+package org.apache.cordova.plugin;
 
-import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
+import org.apache.cordova.CallbackContext;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import android.annotation.SuppressLint;
-import android.util.Base64;
+import org.json.JSONObject;
 
 /**
-* This class exposes methods in Cordova that can be called from JavaScript.
-*/
+ * This class echoes a string called from JavaScript.
+ */
 public class Echo extends CordovaPlugin {
 
+    @Override
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+        if (action.equals("echo")) {
+            String message = args.getString(0);
+            this.echo(message, callbackContext);
+            return true;
+        }
+        return false;
+    }
 
-     private volatile boolean bulkEchoing;
-
-     /**
-     * Executes the request and returns PluginResult.
-     *
-     * @param action            The action to execute.
-     * @param args              JSONArry of arguments for the plugin.
-     * @param callbackContext   The callback context from which we were invoked.
-     * @return                  A PluginResult object with a status and message.
-     */
-    @SuppressLint("NewApi")
-	public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-        try {
-            if (action.equals("echo")) {
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, args.getString(0)));
-                return true;
-            } else if(action.equals("echoAsync")) {
-                cordova.getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                    	callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, args.optString(0)));
-                    }
-                });
-                return true;
-            } else if(action.equals("echoArrayBuffer")) {
-            	String data = args.optString(0);
-                byte[] rawData= Base64.decode(data, Base64.DEFAULT);
-            	callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, rawData));
-                return true;
-            } else if(action.equals("echoArrayBufferAsync")) {
-                cordova.getThreadPool().execute(new Runnable() {
-                    public void run() {
-                        String data = args.optString(0);
-                        byte[] rawData= Base64.decode(data, Base64.DEFAULT);
-                        callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, rawData));
-                    }
-                });
-                return true;
-            } else if(action.equals("echoMultiPart")) {
-            	callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, args.getJSONObject(0)));
-                return true;
-            } else if(action.equals("stopEchoBulk")) {
-                bulkEchoing = false;
-            } else if(action.equals("echoBulk")) {
-                if (bulkEchoing) {
-                    return true;
-                }
-                final String payload = args.getString(0);
-                final int delayMs = args.getInt(1);
-                bulkEchoing = true;
-                cordova.getThreadPool().execute(new Runnable() {
-                    public void run() {
-                        while (bulkEchoing) {
-                            try {
-                                Thread.sleep(delayMs);
-                            } catch (InterruptedException e) {}
-                            PluginResult pr = new PluginResult(PluginResult.Status.OK, payload);
-                            pr.setKeepCallback(true);
-                            callbackContext.sendPluginResult(pr);
-                        }
-                        PluginResult pr = new PluginResult(PluginResult.Status.OK, payload);
-                        callbackContext.sendPluginResult(pr);
-                    }
-                });
-                return true;
-            }
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
-            return false;
-        } catch (JSONException e) {
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
-            return false;
+    private void echo(String message, CallbackContext callbackContext) {
+        if (message != null && message.length() > 0) {
+            callbackContext.success(message);
+        } else {
+            callbackContext.error("Expected one non-empty string argument.");
         }
     }
 }
