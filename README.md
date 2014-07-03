@@ -43,11 +43,3 @@ To invoke in your javascript: <br>
              alert(echoValue == "echome"); // should alert true.
          };
 
-<<<<<<< HEAD
-=======
-Plugin implementation of the Echo function.
-
-### Installation
-`cordova plugin add https://github.com/BobSaintClare/cordova-plugin-echo.git`
->>>>>>> FETCH_HEAD
-
